@@ -1,14 +1,42 @@
+// ===== インポート =====
+// ReactライブラリとuseEffect（副作用処理）、useRef（DOM要素参照）
 import React, { useEffect, useRef } from 'react';
+// アプリ全体の状態管理ストア
 import { useAppStore } from '../store/appStore';
+// このコンポーネントのスタイルシート
 import './PomodoroTimer.css';
 
+/**
+ * ===== ポモドーロタイマーコンポーネント =====
+ * 
+ * ポモドーロテクニック用のタイマーコンポーネントです。
+ * 25分集中 + 5分休憩のサイクルで学習効率を高める手法です。
+ * 
+ * 【表示内容】
+ * - 現在のモード表示（集中時間/休憩中）
+ * - セッション番号（何回目のポモドーロか）
+ * - 円形の進行状況バーと残り時間
+ * - 開始/一時停止/リセットボタン
+ * - 次のフェーズの予告表示
+ * - ブラウザ通知有効化ボタン
+ * 
+ * 【機能】
+ * - 25分の集中時間と5分の休憩時間の自動切り替え
+ * - タイマー終了時のブラウザ通知とバイブレーション
+ * - 手動での開始/停止/リセット操作
+ * - セッション数のカウント
+ */
 const PomodoroTimer: React.FC = () => {
+  // ===== 状態管理からの値取得 =====
   const { pomodoroState, setPomodoroState } = useAppStore();
   const { timeLeft, isBreak, isActive, session } = pomodoroState;
+  
+  // ===== タイマーの参照保持用 =====
   const intervalRef = useRef<number | null>(null);
 
-  const WORK_TIME = 25 * 60; // 25分
-  const BREAK_TIME = 5 * 60; // 5分
+  // ===== 時間定数の定義 =====
+  const WORK_TIME = 25 * 60;  // 25分（集中時間）
+  const BREAK_TIME = 5 * 60;  // 5分（休憩時間）
 
   useEffect(() => {
     if (isActive && timeLeft > 0) {
@@ -98,20 +126,26 @@ const PomodoroTimer: React.FC = () => {
     requestNotificationPermission();
   }, []);
 
+  // ===== コンポーネントのレンダリング =====
   return (
     <div className={`pomodoro-timer ${isBreak ? 'break-mode' : 'work-mode'}`}>
       <div className="card">
+        {/* ===== タイマーヘッダー（モード表示） ===== */}
         <div className="timer-header">
           <h3>
+            {/* 現在のモードに応じてアイコンとテキストを切り替え */}
             {isBreak ? '🧘 休憩中' : '📚 集中時間'}
           </h3>
+          {/* 現在のセッション番号表示 */}
           <div className="session-counter">
             セッション {session}
           </div>
         </div>
 
+        {/* ===== タイマー表示エリア ===== */}
         <div className="timer-display">
           <div className="time-circle">
+            {/* 円形の進行状況バー（SVGで描画） */}
             <svg width="120" height="120" className="progress-ring">
               <circle
                 cx="60"
@@ -135,19 +169,23 @@ const PomodoroTimer: React.FC = () => {
                 className="progress-circle"
               />
             </svg>
+            {/* 中央に残り時間を表示 */}
             <div className="time-text">
               {formatTime(timeLeft)}
             </div>
           </div>
         </div>
 
+        {/* ===== タイマー操作ボタン ===== */}
         <div className="timer-controls">
+          {/* 開始/一時停止ボタン（状態に応じてテキストとスタイル変更） */}
           <button
             className={`btn ${isActive ? 'btn-danger' : 'btn-success'}`}
             onClick={toggleTimer}
           >
             {isActive ? '⏸️ 一時停止' : '▶️ 開始'}
           </button>
+          {/* リセットボタン（タイマーを初期状態に戻す） */}
           <button
             className="btn btn-secondary"
             onClick={resetTimer}
@@ -156,10 +194,13 @@ const PomodoroTimer: React.FC = () => {
           </button>
         </div>
 
+        {/* ===== タイマー情報エリア ===== */}
         <div className="timer-info">
+          {/* 次のフェーズの予告 */}
           <div className="next-phase">
             次は: {isBreak ? '作業時間 (25分)' : '休憩時間 (5分)'}
           </div>
+          {/* ブラウザ通知が未許可の場合のみ表示 */}
           {Notification.permission === 'default' && (
             <button
               className="btn btn-sm btn-secondary notification-btn"
@@ -174,4 +215,5 @@ const PomodoroTimer: React.FC = () => {
   );
 };
 
+// コンポーネントをエクスポート（他のファイルから使用可能にする）
 export default PomodoroTimer;

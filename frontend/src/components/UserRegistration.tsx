@@ -1,7 +1,30 @@
+// ===== インポート =====
+// ReactライブラリとuseState（コンポーネント内状態管理）、useEffect（副作用処理）
 import React, { useState, useEffect } from 'react';
+// アプリ全体の状態管理ストア
 import { useAppStore } from '../store/appStore';
+// このコンポーネントのスタイルシート
 import './UserRegistration.css';
 
+/**
+ * ===== ユーザー登録コンポーネント =====
+ * 
+ * 初回利用時に表示される学習セッション作成フォームです。
+ * 
+ * 【表示内容】
+ * - ニックネーム入力フィールド（必須、本名禁止）
+ * - 学習場所選択ドロップダウン（オプション）
+ * - 学習科目入力フィールド（オプション）
+ * - 退室予定時刻選択（必須、デフォルト2時間後）
+ * - 滞在時間公開設定チェックボックス
+ * - 学習開始ボタン
+ * 
+ * 【機能】
+ * - フォームバリデーション（入力値検証）
+ * - 本名使用のチェックと禁止
+ * - サーバーとの通信でセッション作成
+ * - エラーハンドリングと表示
+ */
 const UserRegistration: React.FC = () => {
   const { createSession, locations, isLoading, error, clearError } = useAppStore();
   const [formData, setFormData] = useState({
@@ -156,4 +179,5 @@ const UserRegistration: React.FC = () => {
   );
 };
 
+// コンポーネントをエクスポート（他のファイルから使用可能にする）
 export default UserRegistration;

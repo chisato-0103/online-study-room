@@ -16,15 +16,15 @@ class SocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('🔌 Socket connected:', this.socket?.id);
+      console.log('🔌 ソケット接続完了:', this.socket?.id);
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('🔌 Socket disconnected:', reason);
+      console.log('🔌 ソケット切断:', reason);
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('🔌 Socket connection error:', error);
+      console.error('🔌 ソケット接続エラー:', error);
     });
 
     return this.socket;
@@ -41,7 +41,7 @@ class SocketService {
     if (this.socket && this.socket.connected) {
       this.socket.emit(event, data);
     } else {
-      console.warn('Socket not connected, attempting to connect...');
+      console.warn('ソケット未接続。接続を試行中...');
       this.connect().emit(event, data);
     }
   }
