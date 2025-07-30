@@ -1,32 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAppStore } from '../store/appStore';
 import './PomodoroTimer.css';
 
 const PomodoroTimer: React.FC = () => {
   const { pomodoroState, setPomodoroState } = useAppStore();
   const { timeLeft, isBreak, isActive, session } = pomodoroState;
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
   const WORK_TIME = 25 * 60; // 25分
   const BREAK_TIME = 5 * 60; // 5分
 
   useEffect(() => {
     if (isActive && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = window.setInterval(() => {
         setPomodoroState({ timeLeft: timeLeft - 1 });
       }, 1000);
     } else if (timeLeft === 0 && isActive) {
       handleTimerComplete();
     } else {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        window.clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     }
 
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        window.clearInterval(intervalRef.current);
       }
     };
   }, [isActive, timeLeft, setPomodoroState]);
