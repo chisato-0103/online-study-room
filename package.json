@@ -1,0 +1,18 @@
+{
+  "name": "online-study-room",
+  "version": "1.0.0",
+  "description": "オンライン自習室アプリケーション",
+  "scripts": {
+    "dev": "npm run dev:frontend & npm run dev:backend",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "start": "cd backend && npm start"
+  },
+  "keywords": ["study", "room", "pomodoro", "real-time"],
+  "author": "chisato-0103",
+  "license": "MIT"
+}
