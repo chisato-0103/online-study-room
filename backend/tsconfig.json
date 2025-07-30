@@ -12,7 +12,7 @@
     "isolatedModules": true,
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "..",
 
     "strict": true,
     "noUnusedLocals": false,
