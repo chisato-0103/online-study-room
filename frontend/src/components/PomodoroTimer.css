@@ -1,0 +1,110 @@
+.pomodoro-timer .card {
+  position: relative;
+  overflow: hidden;
+}
+
+.work-mode .card {
+  border-left: 4px solid #3b82f6;
+}
+
+.break-mode .card {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.timer-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+
+.session-counter {
+  background: #f3f4f6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.timer-display {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.time-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-circle {
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.time-text {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  font-family: 'Courier New', monospace;
+}
+
+.break-mode .time-text {
+  color: #059669;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.timer-controls .btn {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.timer-info {
+  text-align: center;
+}
+
+.next-phase {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.notification-btn {
+  font-size: 0.8rem !important;
+  padding: 0.4rem 0.8rem !important;
+}
+
+@media (max-width: 768px) {
+  .timer-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .time-text {
+    font-size: 1.25rem;
+  }
+  
+  .timer-controls {
+    flex-direction: column;
+  }
+}
