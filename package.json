@@ -12,7 +12,15 @@
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "start": "cd backend && npm start"
   },
-  "keywords": ["study", "room", "pomodoro", "real-time"],
+  "keywords": [
+    "study",
+    "room",
+    "pomodoro",
+    "real-time"
+  ],
   "author": "chisato-0103",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.1.0"
+  }
 }
