@@ -66,6 +66,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       });
 
       // ===== WebSocketイベントリスナーの設定 =====
+      // 接続時にサーバーから現在のアクティブセッション一覧を受信
+      socket.on('active-sessions', (sessions: StudySession[]) => {
+        set({ activeSessions: sessions }); // サーバーから受信したセッション一覧で状態を更新
+      });
+
       // 新しいユーザーが参加したときの処理
       socket.on('user-joined', (session: StudySession) => {
         set(state => ({

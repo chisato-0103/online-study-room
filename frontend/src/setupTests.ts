@@ -2,6 +2,7 @@
 // このファイルはすべてのテストファイルが実行される前に一度だけ実行されます
 
 import '@testing-library/jest-dom'
+import { vi } from 'vitest'
 
 // Socket.ioのモック設定
 vi.mock('./services/socket', () => ({
@@ -20,7 +21,7 @@ Object.defineProperty(window, 'Notification', {
   value: class MockNotification {
     static permission = 'granted'
     static requestPermission = vi.fn().mockResolvedValue('granted')
-    constructor(title: string, options?: NotificationOptions) {
+    constructor(_title: string, _options?: any) {
       // モック通知の作成
     }
   },

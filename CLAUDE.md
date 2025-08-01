@@ -37,6 +37,23 @@ cd frontend && npm run lint
 cd backend && npm run lint
 ```
 
+### テスト
+```bash
+# フロントエンドテスト（Vitest）
+cd frontend && npm test                    # テスト実行
+cd frontend && npm run test:ui            # UI付きテスト実行
+cd frontend && npm run test:coverage      # カバレッジ付きテスト実行
+
+# バックエンドテスト（Jest）
+cd backend && npm test                     # テスト実行
+cd backend && npm run test:watch          # ウォッチモードでテスト実行
+cd backend && npm run test:coverage       # カバレッジ付きテスト実行
+
+# 単一テストファイル実行例
+cd frontend && npx vitest run components/Timer.test.tsx
+cd backend && npx jest src/services/sessionService.test.ts
+```
+
 ### 本番環境
 ```bash
 npm start  # ビルド済みファイルからバックエンドサーバーを起動

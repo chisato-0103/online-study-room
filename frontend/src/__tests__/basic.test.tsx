@@ -1,6 +1,6 @@
 // 基本的なテストファイル
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+// import { render, screen } from '@testing-library/react'
 import { useAppStore } from '../store/appStore'
 
 // モックを設定

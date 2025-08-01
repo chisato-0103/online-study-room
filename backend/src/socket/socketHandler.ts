@@ -3,6 +3,8 @@
 import { Server, Socket } from 'socket.io';
 // 共通で使うデータ型の定義
 import type { StudySession, UpdateSessionDTO } from '@shared/types/index.js';
+// セッションストレージを共有
+import { sessions } from '../routes/sessionRoutes.js';
 
 // ===== 型定義 =====
 // ソケットに保存するデータの型
@@ -12,8 +14,8 @@ interface SocketData {
 }
 
 // ===== グローバル状態管理 =====
-// アクティブな学習セッションを保存（ソケットID -> セッション情報）
-const activeSessions = new Map<string, StudySession>();
+// ソケットIDとセッションIDのマッピング（ソケットID -> セッションID）
+const socketSessionMap = new Map<string, number>();
 // 各場所の現在の人数を保存（場所名 -> 人数）
 const locationCounts = new Map<string, number>();
 
@@ -24,14 +26,27 @@ export const setupSocket = (io: Server) => {
   io.on('connection', (socket: Socket) => {
     console.log(`クライアント接続: ${socket.id}`);
 
+    // 接続時に現在のアクティブセッション一覧を送信
+    const activeSessions = Array.from(sessions.values()).filter(session => session.isActive);
+    socket.emit('active-sessions', activeSessions);
+
+    // 場所統計を再計算（実際のアクティブセッションに基づいて）
+    recalculateLocationStats();
+
+    // 接続時に現在の各場所の人数統計を送信
+    socket.emit('room-stats', Array.from(locationCounts.entries()).map(([location, count]) => ({
+      location,
+      count
+    })));
+
     // ===== ルーム参加処理 =====
     // ユーザーが学習ルームに参加するときの処理
     socket.on('join-room', async (data: { sessionId: number; session: StudySession }) => {
       try {
         const { sessionId, session } = data;
 
-        // アクティブセッションに追加
-        activeSessions.set(socket.id, session);
+        // ソケットIDとセッションIDをマッピング
+        socketSessionMap.set(socket.id, sessionId);
         // ソケットにメタデータを保存
         socket.data = { sessionId, location: session.location };
 
@@ -69,14 +84,14 @@ export const setupSocket = (io: Server) => {
     // ユーザーが学習セッションを更新するときの処理（場所変更、ステータス変更など）
     socket.on('update-session', (data: { sessionId: number; updates: UpdateSessionDTO }) => {
       try {
-        const { updates } = data;
-        // 現在のセッション情報を取得
-        const currentSession = activeSessions.get(socket.id);
+        const { sessionId, updates } = data;
+        // 共有ストレージから現在のセッション情報を取得
+        const currentSession = sessions.get(sessionId);
 
         if (currentSession) {
           // 新しい情報でセッションを更新
-          const updatedSession = { ...currentSession, ...updates };
-          activeSessions.set(socket.id, updatedSession);
+          const updatedSession = { ...currentSession, ...updates, updatedAt: new Date().toISOString() };
+          sessions.set(sessionId, updatedSession);
 
           // 学習場所が変更された且、新しい場所が指定されている場合
           if (currentSession.location !== updates.location && updates.location) {
@@ -118,12 +133,12 @@ export const setupSocket = (io: Server) => {
 // ===== ユーザー退室処理関数 =====
 // ユーザーがルームから退室するときの共通処理
 const handleUserLeave = (socket: Socket) => {
-  // セッション情報とソケットのメタデータを取得
-  const session = activeSessions.get(socket.id);
+  // ソケットのメタデータを取得
   const socketData = socket.data as SocketData;
+  const sessionId = socketSessionMap.get(socket.id);
 
-  // セッションが存在し、セッションIDが設定されている場合
-  if (session && socketData.sessionId) {
+  // セッションIDが設定されている場合
+  if (sessionId && socketData.sessionId) {
     // 学習場所が設定されている場合
     if (socketData.location) {
       // その場所のルームから退室
@@ -135,8 +150,8 @@ const handleUserLeave = (socket: Socket) => {
     // 他のユーザーにユーザーの退室を通知
     socket.broadcast.emit('user-left', { sessionId: socketData.sessionId });
 
-    // アクティブセッションから削除
-    activeSessions.delete(socket.id);
+    // ソケットセッションマッピングから削除
+    socketSessionMap.delete(socket.id);
 
     // 全ユーザーに更新された各場所の人数統計を送信
     socket.broadcast.emit('room-stats', Array.from(locationCounts.entries()).map(([location, count]) => ({
@@ -161,4 +176,22 @@ const updateLocationCount = (location: string, delta: number) => {
     // そうでなければ新しい人数を設定
     locationCounts.set(location, newCount);
   }
+};
+
+// ===== 場所統計再計算関数 =====
+// 実際のアクティブセッションに基づいて場所統計を再計算する関数
+const recalculateLocationStats = () => {
+  // 統計をクリア
+  locationCounts.clear();
+  
+  // 全アクティブセッションを取得
+  const activeSessions = Array.from(sessions.values()).filter(session => session.isActive);
+  
+  // 各セッションの場所を集計
+  activeSessions.forEach(session => {
+    if (session.location) {
+      const currentCount = locationCounts.get(session.location) || 0;
+      locationCounts.set(session.location, currentCount + 1);
+    }
+  });
 };

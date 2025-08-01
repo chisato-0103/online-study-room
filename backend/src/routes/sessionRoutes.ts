@@ -30,7 +30,7 @@ const updateSessionSchema = z.object({
 
 // ===== データストレージ =====
 // アクティブなセッションを保存するメモリ内ストレージ（セッションID -> セッション情報）
-const sessions = new Map<number, any>();
+export const sessions = new Map<number, any>();
 // セッションIDの採番カウンター
 let sessionIdCounter = 1;
 
@@ -42,8 +42,9 @@ router.post('/', async (req, res) => {
     const validatedData = createSessionSchema.parse(req.body) as CreateSessionDTO;
     
     // ニックネームのセキュリティチェック（本名使用禁止）
+    const kanjiMatches = validatedData.nickname.match(/[一-龯]/g);
     if (validatedData.nickname.toLowerCase().includes('本名') || 
-        validatedData.nickname.match(/[一-龯]/g)?.length > 10) {
+        (kanjiMatches && kanjiMatches.length > 10)) {
       return res.status(400).json({ 
         error: '本名の使用は禁止されています。ニックネームを使用してください。' 
       });
